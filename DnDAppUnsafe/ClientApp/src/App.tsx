@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { Route } from 'react-router';
-import Layout from './components/Layout';
-import Counter from './components/Counter';
-import FetchData from './components/FetchData';
+
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import './custom.css'
+import { Adventure } from './components/Adventure';
+import Home from './components/Home';
 
 export default () => (
-    <Layout>
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data/:startDateIndex?' component={FetchData} />
-    </Layout>
+    <Router>
+        <div>
+            <Route path={"/"} exact component={Home}></Route>
+            <Route path={"/adventure"} component={Adventure}></Route>
+        </div>
+    </Router>
 );
