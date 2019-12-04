@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using DnDAppUnsafe.Helpers;
+using DnDAppUnsafe.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Hosting;
 
 namespace DnDAppUnsafe
@@ -22,8 +23,16 @@ namespace DnDAppUnsafe
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddCors();
+            services.AddControllers();
 
-            // In production, the React files will be served from this directory
+            // configure basic authentication 
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
@@ -66,6 +75,17 @@ namespace DnDAppUnsafe
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }
